@@ -1,0 +1,14 @@
+%import .terminals (_NEWLINE, _INDENT, _DEDENT, COMMENT, _WHITESPACE, _LINE_CONTINUATION)
+%import .keywords (FN, PASS)
+
+%ignore _WHITESPACE
+%ignore _LINE_CONTINUATION
+%ignore COMMENT
+
+module: (_NEWLINE | module_statement)+
+
+module_statement: FN "main" "(" ")" ":" block
+
+block: _NEWLINE _INDENT (statement _NEWLINE)+ _DEDENT
+
+statement: PASS
