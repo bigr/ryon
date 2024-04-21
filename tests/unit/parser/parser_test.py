@@ -1,11 +1,4 @@
-import pytest
-
 from ryon.parser import RyonParser
-
-
-@pytest.fixture
-def parser():
-    return RyonParser()
 
 
 def test_parser_initialization():
