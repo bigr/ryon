@@ -10,7 +10,8 @@ readme = {file = "README.md", content-type = "text/markdown"}
 license = {file = "LICENSE"}
 requires-python = ">=3.10"
 dependencies = [
-    "lark==1.1.9"
+    "lark==1.1.9",
+    "llvmlite==0.42.0",
 ]
 
 [project.urls]
