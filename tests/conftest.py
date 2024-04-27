@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from ryon.compiler import RyonCompiler
 from ryon.parser import RyonParser
 
 
@@ -13,3 +14,8 @@ def tests_data_dir():
 @pytest.fixture
 def parser():
     return RyonParser()
+
+
+@pytest.fixture
+def compiler():
+    return RyonCompiler()
