@@ -1,14 +1,65 @@
-%import .terminals (_NEWLINE, _INDENT, _DEDENT, COMMENT, _WHITESPACE, _LINE_CONTINUATION)
-%import .keywords (FN, PASS)
+
+module: (_NEWLINE | module_statement)+
+
+?module_statement: function_definition
+
+
+// functions
+function_definition: _FN function_identifier "(" [function_arguments] ")" "->" function_return_type ":" suite
+?function_arguments: function_argument ("," function_argument)*
+?function_identifier: SNAKE_CASE_NAME
+?function_argument:  function_argument_identifier ":" function_argument_type
+?function_argument_identifier: SNAKE_CASE_NAME
+?function_argument_type: type
+?function_return_type: type
+
+
+// statements
+suite: _NEWLINE _INDENT (statement _NEWLINE)+ _DEDENT
+?statement: _PASS
+          | return_statement
+return_statement: _RETURN expression
+
+
+// expressions
+?expression: number_literal
+           | variable_identifier
+           | summation
+summation: addend ("+" addend)+
+?addend: number_literal
+       | variable_identifier
+
+// types
+?type: simple_type
+
+simple_type: UPPER_CAMEL_CASE_NAME
+
+// variables
+variable_identifier: SNAKE_CASE_NAME
+
+// keywords
+_FN: "fn"
+_PASS: "pass"
+_RETURN: "return"
+
+// literals
+?number_literal: DECIMAL_NUMBER
+
+// terminals
+
+%declare _INDENT _DEDENT
+
+_WHITESPACE: /[\t \f]+/
+COMMENT: /#[^\n]*/
+_NEWLINE: ( /\r?\n[\t ]*/ | COMMENT )+
+_LINE_CONTINUATION:  /\\[\t \f]*\r?\n/
+
+SNAKE_CASE_NAME: /[a-z][a-z_]*\d*/
+UPPER_CAMEL_CASE_NAME: /([A-Z][a-z]*)+\d*/
+
+DECIMAL_NUMBER: /\d+/
+
 
 %ignore _WHITESPACE
 %ignore _LINE_CONTINUATION
 %ignore COMMENT
-
-module: (_NEWLINE | module_statement)+
-
-module_statement: FN "main" "(" ")" ":" block
-
-block: _NEWLINE _INDENT (statement _NEWLINE)+ _DEDENT
-
-statement: PASS

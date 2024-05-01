@@ -1,6 +1,0 @@
-%declare _INDENT _DEDENT
-
-_WHITESPACE: /[\t \f]+/
-COMMENT: /#[^\n]*/
-_NEWLINE: ( /\r?\n[\t ]*/ | COMMENT )+
-_LINE_CONTINUATION:  /\\[\t \f]*\r?\n/
