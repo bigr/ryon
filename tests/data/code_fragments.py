@@ -8,12 +8,14 @@ class Fragment:
     code: str = field(repr=False)
     ast: str = field(repr=False)
     hlir: str = field(repr=False)
+    llvm_ir: str = field(repr=False)
 
     def __post_init__(self):
         # Using object.__setattr__ to bypass the immutability for initialization
         object.__setattr__(self, "code", textwrap.dedent(self.code).strip() + "\n")
         object.__setattr__(self, "ast", textwrap.dedent(self.ast).strip() + "\n")
         object.__setattr__(self, "hlir", textwrap.dedent(self.hlir).strip() + "\n")
+        object.__setattr__(self, "llvm_ir", textwrap.dedent(self.llvm_ir).strip())
 
 
 fragments = [
@@ -57,7 +59,14 @@ fragments = [
                     - !node.Return
                         expression: !node.DecimalNumber
                             value: 10
-       """,
+        """,
+        llvm_ir="""
+            define i32 @"hello_world"()
+            {
+            entry:
+              ret i32 10
+            }
+        """,
     ),
     Fragment(
         name="Add function",
@@ -144,6 +153,15 @@ fragments = [
                                 type: null
                             - !node.DecimalNumber
                                 value: 5
+        """,
+        llvm_ir="""
+            define i32 @"add"(i32 %"a", i32 %"b")
+            {
+            entry:
+              %"result" = add i32 %"a", %"b"
+              %"result.1" = add i32 %"result", 5
+              ret i32 %"result.1"
+            }
         """,
     ),
 ]
