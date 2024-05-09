@@ -7,11 +7,13 @@ class Fragment:
     name: str
     code: str = field(repr=False)
     ast: str = field(repr=False)
+    hlir: str = field(repr=False)
 
     def __post_init__(self):
         # Using object.__setattr__ to bypass the immutability for initialization
         object.__setattr__(self, "code", textwrap.dedent(self.code).strip() + "\n")
         object.__setattr__(self, "ast", textwrap.dedent(self.ast).strip() + "\n")
+        object.__setattr__(self, "hlir", textwrap.dedent(self.hlir).strip() + "\n")
 
 
 fragments = [
@@ -42,6 +44,20 @@ fragments = [
                         subtree:
                         - !Token 'DECIMAL_NUMBER 10'
         """,
+        hlir="""
+            !node.Module
+            module_statements:
+            - !node.Fn
+                name: hello_world
+                type: !node.SimpleType
+                    name: I32
+                args: []
+                body: !node.Suite
+                    statements:
+                    - !node.Return
+                        expression: !node.DecimalNumber
+                            value: 10
+       """,
     ),
     Fragment(
         name="Add function",
@@ -98,6 +114,36 @@ fragments = [
                                 subtree:
                                 - !Token 'SNAKE_CASE_NAME b'
                             - !Token 'DECIMAL_NUMBER 5'
+        """,
+        hlir="""
+            !node.Module
+            module_statements:
+            - !node.Fn
+                name: add
+                type: !node.SimpleType
+                    name: I32
+                args:
+                - !node.Arg
+                    name: a
+                    type: !node.SimpleType
+                        name: I32
+                - !node.Arg
+                    name: b
+                    type: !node.SimpleType
+                        name: I32
+                body: !node.Suite
+                    statements:
+                    - !node.Return
+                        expression: !node.Summation
+                            addends:
+                            - !node.Var
+                                name: a
+                                type: null
+                            - !node.Var
+                                name: b
+                                type: null
+                            - !node.DecimalNumber
+                                value: 5
         """,
     ),
 ]
