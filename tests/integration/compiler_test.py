@@ -1,25 +1,29 @@
-from ctypes import CFUNCTYPE, c_void_p
-
 import llvmlite.binding as llvm
+import pytest
+from ryon.hlir.yaml_loader import yaml_to_hlir
+
+from tests.data.code_fragments import fragments
 
 
-def test_compiler(parser, compiler, tests_data_dir):
-    content = open(tests_data_dir / "foo.ry").read()
-    parsed_tree = parser.parse(content)
-
+@pytest.fixture
+def init_llvm():
     llvm.initialize()
     llvm.initialize_native_target()
     llvm.initialize_native_asmprinter()
-    compiler.visit(parsed_tree)
 
-    llvm_ir_parsed = llvm.parse_assembly(str(compiler.ir_module))
-    llvm_ir_parsed.verify()
+
+@pytest.mark.parametrize("fragment", fragments)
+def test_compiler(parser, compiler, init_llvm, fragment):
+    module = compiler.visit(yaml_to_hlir(fragment.hlir))
+
+    compiled_module = llvm.parse_assembly(str(module))
+    compiled_module.verify()
 
     target_machine = llvm.Target.from_default_triple().create_target_machine()
-    engine = llvm.create_mcjit_compiler(llvm_ir_parsed, target_machine)
+    engine = llvm.create_mcjit_compiler(compiled_module, target_machine)
     engine.finalize_object()
 
-    entry = engine.get_function_address("main")
-    cfunc = CFUNCTYPE(c_void_p)(entry)
+    for name, cfunc, args, expected_return in fragment.functions:
+        entry = engine.get_function_address(name)
 
-    assert cfunc() is None
+        assert cfunc(entry)(*args) == expected_return
