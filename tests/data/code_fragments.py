@@ -1,5 +1,7 @@
+import ctypes
 from dataclasses import dataclass, field
 import textwrap
+from typing import Any, Type
 
 
 @dataclass(frozen=True)
@@ -9,6 +11,7 @@ class Fragment:
     ast: str = field(repr=False)
     hlir: str = field(repr=False)
     llvm_ir: str = field(repr=False)
+    functions: tuple[tuple[str, Type, tuple[Any, ...], Any], ...] = field(repr=False)
 
     def __post_init__(self):
         # Using object.__setattr__ to bypass the immutability for initialization
@@ -67,6 +70,7 @@ fragments = [
               ret i32 10
             }
         """,
+        functions=(("hello_world", ctypes.CFUNCTYPE(ctypes.c_void_p), (), 10),),
     ),
     Fragment(
         name="Add function",
@@ -163,5 +167,6 @@ fragments = [
               ret i32 %"result.1"
             }
         """,
+        functions=(("add", ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int, ctypes.c_int), (3, 4), 12),),
     ),
 ]

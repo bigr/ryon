@@ -4,15 +4,6 @@ from ryon.hlir.yaml_loader import yaml_to_hlir
 from ryon.compiler import RyonCompiler
 from tests.data.code_fragments import fragments
 
-import llvmlite.binding as llvm
-
-
-@pytest.fixture
-def init_llvm():
-    llvm.initialize()
-    llvm.initialize_native_target()
-    llvm.initialize_native_asmprinter()
-
 
 def test_compiler_initialization():
     RyonCompiler()
