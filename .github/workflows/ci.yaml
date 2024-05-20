@@ -20,22 +20,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install flit
+          pip install flit pre-commit
           flit install --deps develop
 
-      - name: Check code with ruff
+      - name: Run pre-commit
         run: |
-          pip install ruff
-          ruff check
-
-      - name: Format code with ruff
-        run: |
-          ruff format
-
-      - name: Check type with mypy
-        run: |
-          pip install mypy
-          mypy ryon
+          pre-commit run --all-files
 
       - name: Run tests with pytest
         run: |
