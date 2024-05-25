@@ -90,7 +90,7 @@ class Visitor:
 
         return result
 
-    def _visit(self, node: HLIRNode, parent_data: Optional[Any] = None) -> Any:
+    def _visit(self, node: HLIRNode, parent_data: Optional[Any] = None, breadcrump: tuple[HLIRNode, ...] = ()) -> Any:
         """
         Recursively visits an HLIRNode, handling child node processing.
 
@@ -108,7 +108,7 @@ class Visitor:
 
         method_name = self._camel_to_snake(node.__class__.__name__)
         method = getattr(self, method_name, self.__default__)
-        visitor_gen = method(node, parent_data)
+        visitor_gen = method(node, parent_data, self._transform_breadcrump(breadcrump))
 
         if inspect.isgenerator(visitor_gen):
             node_data = next(visitor_gen)
@@ -116,7 +116,8 @@ class Visitor:
             node_data = visitor_gen
 
         children_generators = {
-            child_name: self._children_generator(child, node_data) for child_name, child in children_nodes.items()
+            child_name: self._children_generator(child, node_data, breadcrump + (node,))
+            for child_name, child in children_nodes.items()
         }
 
         children_data = {child_name: self._next(child_gen) for child_name, child_gen in children_generators.items()}
@@ -132,7 +133,7 @@ class Visitor:
 
         yield final_data
 
-    def __default__(self, node: HLIRNode, children_data: Any) -> Any:
+    def __default__(self, node: HLIRNode, children_data: Any, breadcrump: Any) -> Any:
         """
         The default method called if no specific visitor method exists for a node type.
 
@@ -146,6 +147,9 @@ class Visitor:
            The node itself, typically unchanged.
         """
         return node
+
+    def _transform_breadcrump(self, breadcrump: tuple[HLIRNode, ...]) -> Any:
+        return breadcrump
 
     def _get_children_nodes(self, node: HLIRNode) -> Dict[str, Any]:
         """
@@ -168,7 +172,7 @@ class Visitor:
             children[field.name] = child
         return children
 
-    def _children_generator(self, child: Any, parent_data) -> Any:
+    def _children_generator(self, child: Any, parent_data, breadcrump: tuple[HLIRNode, ...]) -> Any:
         """
         Creates a generator for visiting a child node or processing a tuple of child nodes.
 
@@ -182,11 +186,11 @@ class Visitor:
             A generator for the visited child node, a tuple of visited child nodes, or the unchanged value.
         """
         if isinstance(child, HLIRNode):
-            return self._visit(child, parent_data)
+            return self._visit(child, parent_data, breadcrump)
         elif isinstance(child, tuple):
             # Only process tuples containing HLIRNodes
             if any(isinstance(c, HLIRNode) for c in child):
-                return tuple(self._visit(c, parent_data) if isinstance(c, HLIRNode) else c for c in child)
+                return tuple(self._visit(c, parent_data, breadcrump) if isinstance(c, HLIRNode) else c for c in child)
             else:
                 return child
         else:
