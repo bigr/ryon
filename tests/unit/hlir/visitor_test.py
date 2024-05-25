@@ -30,11 +30,11 @@ def test_visit_simple_node(fragment, call_count, calls):
             self.call_count = 0
             self.calls = []
 
-        def simple_type(self, node, children_data):
+        def simple_type(self, node, children_data, breadcrump):
             self.call_count += 1
             self.calls.append((node, children_data))
 
-        def __default__(self, node, children_data):
+        def __default__(self, node, children_data, breadcrump):
             return node.__class__.__name__
 
     visitor = TestVisitor()
@@ -61,6 +61,7 @@ def test_visit_simple_node(fragment, call_count, calls):
                         body=Suite(statements=(Return(expression=DecimalNumber(value=10)),)),
                     ),
                     "This is module",
+                    ("Module",),
                 ),
             ],
             [
@@ -87,6 +88,7 @@ def test_visit_simple_node(fragment, call_count, calls):
                         ),
                     ),
                     "This is module",
+                    ("Module",),
                 )
             ],
         ),
@@ -105,18 +107,22 @@ def test_visit_complex_node(fragment, call_count, calls, children_data):
             self.calls = []
             self.children_data = []
 
-        def fn(self, node, parent_data):
+        def fn(self, node, parent_data, breadcrump):
             self.call_count += 1
-            self.calls.append((node, parent_data))
+            self.calls.append((node, parent_data, breadcrump))
+
             children_data = yield node.name
             self.children_data.append(children_data)
 
-        def module(self, node, parent_data):
+        def module(self, node, parent_data, breadcrump):
             yield "This is module"
             yield "This is module - final"
 
-        def __default__(self, node, parent_Data):
+        def __default__(self, node, parent_data, breadcrump):
             return node.__class__.__name__
+
+        def _transform_breadcrump(self, breadcrump):
+            return tuple(b.__class__.__name__ for b in breadcrump)
 
     visitor = TestVisitor()
     result = visitor.visit(hlir)
