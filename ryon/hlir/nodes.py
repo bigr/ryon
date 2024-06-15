@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
@@ -5,6 +6,13 @@ from typing import Optional
 @dataclass(frozen=True)
 class HLIRNode:
     pass
+
+
+@dataclass(frozen=True)
+class ContextNode(ABC, HLIRNode):
+    @abstractmethod
+    def get_context_name(self):
+        pass
 
 
 @dataclass(frozen=True)
@@ -65,11 +73,14 @@ class Suite(HLIRNode):
 
 
 @dataclass(frozen=True)
-class Fn(HLIRNode):
+class Fn(ContextNode):
     name: str
     type: TypeNode
     args: tuple[Arg, ...]
     body: Suite
+
+    def get_context_name(self):
+        return self.name
 
 
 @dataclass(frozen=True)

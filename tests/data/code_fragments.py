@@ -3,6 +3,9 @@ from dataclasses import dataclass, field
 import textwrap
 from typing import Any, Type
 
+from ryon.hlir.nodes import SimpleType
+from ryon.symbols.symbols import SymbolTable, Symbol
+
 
 @dataclass(frozen=True)
 class Fragment:
@@ -12,6 +15,7 @@ class Fragment:
     hlir: str = field(repr=False)
     llvm_ir: str = field(repr=False)
     functions: tuple[tuple[str, Type, tuple[Any, ...], Any], ...] = field(repr=False)
+    symbol_table: SymbolTable
 
     def __post_init__(self):
         # Using object.__setattr__ to bypass the immutability for initialization
@@ -71,6 +75,7 @@ fragments = [
             }
         """,
         functions=(("hello_world", ctypes.CFUNCTYPE(ctypes.c_void_p), (), 10),),
+        symbol_table=SymbolTable(),
     ),
     Fragment(
         name="Add function",
@@ -168,5 +173,11 @@ fragments = [
             }
         """,
         functions=(("add", ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int, ctypes.c_int), (3, 4), 12),),
+        symbol_table=SymbolTable(
+            {
+                ("add", "a"): Symbol(type=SimpleType(name="I32")),
+                ("add", "b"): Symbol(type=SimpleType(name="I32")),
+            }
+        ),
     ),
 ]
