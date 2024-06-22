@@ -4,6 +4,8 @@ from ryon.hlir.visitor import Visitor
 
 
 class RyonCompiler(Visitor):
+    _TYPE_MAPPING = {"I32": ir.IntType(32)}
+
     def __init__(self):
         pass
 
@@ -13,7 +15,9 @@ class RyonCompiler(Visitor):
         yield str(module)
 
     def fn(self, node, module, breadcrump):
-        function_type = ir.FunctionType(ir.IntType(32), [ir.IntType(32)] * len(node.args))
+        function_type = ir.FunctionType(
+            self._TYPE_MAPPING[node.type.name], [self._TYPE_MAPPING[node_arg.type.name] for node_arg in node.args]
+        )
         function = ir.Function(module, function_type, name=node.name)
         for arg, node_arg in zip(function.args, node.args):
             arg.name = node_arg.name
