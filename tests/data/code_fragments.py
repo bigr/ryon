@@ -181,3 +181,124 @@ fragments = [
         ),
     ),
 ]
+
+
+class NumberCodeFragment:
+    @staticmethod
+    def code(number_type: str) -> str:
+        code = f"""
+            fn add(a: {number_type}, b: {number_type}) -> {number_type}:
+                return a + b
+        """
+
+        return textwrap.dedent(code).strip() + "\n"
+
+    @staticmethod
+    def ast(number_type: str) -> str:
+        ast = f"""
+            !Tree
+            node: !Token 'RULE module'
+            subtree:
+            - !Tree
+                node: !Token 'RULE function_definition'
+                subtree:
+                - !Token 'SNAKE_CASE_NAME add'
+                - !Tree
+                    node: !Token 'RULE function_arguments'
+                    subtree:
+                    - !Tree
+                        node: !Token 'RULE function_argument'
+                        subtree:
+                        - !Token 'SNAKE_CASE_NAME a'
+                        - !Tree
+                            node: !Token 'RULE simple_type'
+                            subtree:
+                            - !Token 'UPPER_CAMEL_CASE_NAME {number_type}'
+                    - !Tree
+                        node: !Token 'RULE function_argument'
+                        subtree:
+                        - !Token 'SNAKE_CASE_NAME b'
+                        - !Tree
+                            node: !Token 'RULE simple_type'
+                            subtree:
+                            - !Token 'UPPER_CAMEL_CASE_NAME {number_type}'
+                - !Tree
+                    node: !Token 'RULE simple_type'
+                    subtree:
+                    - !Token 'UPPER_CAMEL_CASE_NAME {number_type}'
+                - !Tree
+                    node: !Token 'RULE suite'
+                    subtree:
+                    - !Tree
+                        node: !Token 'RULE return_statement'
+                        subtree:
+                        - !Tree
+                            node: !Token 'RULE summation'
+                            subtree:
+                            - !Tree
+                                node: !Token 'RULE variable_identifier'
+                                subtree:
+                                - !Token 'SNAKE_CASE_NAME a'
+                            - !Tree
+                                node: !Token 'RULE variable_identifier'
+                                subtree:
+                                - !Token 'SNAKE_CASE_NAME b'
+
+        """
+
+        return textwrap.dedent(ast).strip() + "\n"
+
+    @staticmethod
+    def hlir(number_type: str) -> str:
+        hlir = f"""
+            !node.Module
+            module_statements:
+            - !node.Fn
+                name: add
+                type: !node.SimpleType
+                    name: {number_type}
+                args:
+                - !node.Arg
+                    name: a
+                    type: !node.SimpleType
+                        name: {number_type}
+                - !node.Arg
+                    name: b
+                    type: !node.SimpleType
+                        name: {number_type}
+                body: !node.Suite
+                    statements:
+                    - !node.Return
+                        expression: !node.Summation
+                            addends:
+                            - !node.Var
+                                name: a
+                                type: null
+                            - !node.Var
+                                name: b
+                                type: null
+        """
+
+        return textwrap.dedent(hlir).strip() + "\n"
+
+    @staticmethod
+    def llvm_ir(number_type: str) -> str:
+        _CONV_TABLE = {"F16": "half", "F32": "float", "F64": "double"}
+
+        if number_type in _CONV_TABLE:
+            ntype = _CONV_TABLE[number_type]
+        else:
+            ntype = number_type.lower()
+            if ntype[0] == "u":
+                ntype = "i" + ntype[1:]
+
+        llvm_ir = f"""
+            define {ntype} @"add"({ntype} %"a", {ntype} %"b")
+            {{
+            entry:
+              %"result" = add {ntype} %"a", %"b"
+              ret {ntype} %"result"
+            }}
+        """
+
+        return textwrap.dedent(llvm_ir).strip()
