@@ -4,7 +4,21 @@ from ryon.hlir.visitor import Visitor
 
 
 class RyonCompiler(Visitor):
-    _TYPE_MAPPING = {"I32": ir.IntType(32)}
+    _TYPE_MAPPING = {
+        "I8": ir.IntType(8),
+        "I16": ir.IntType(16),
+        "I32": ir.IntType(32),
+        "I64": ir.IntType(64),
+        "I128": ir.IntType(128),
+        "U8": ir.IntType(8),
+        "U16": ir.IntType(16),
+        "U32": ir.IntType(32),
+        "U64": ir.IntType(64),
+        "U128": ir.IntType(128),
+        "F16": ir.HalfType(),
+        "F32": ir.FloatType(),
+        "F64": ir.DoubleType(),
+    }
 
     def __init__(self):
         pass
