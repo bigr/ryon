@@ -67,3 +67,8 @@ class RyonCompiler(Visitor):
         builder, _ = parent_data
         yield
         yield ir.Constant(ir.IntType(32), int(node.value))
+
+    def typed_integer_literal(self, node, parent_data, breadcrump):
+        builder, _ = parent_data
+        yield
+        yield ir.Constant(self._TYPE_MAPPING[node.type.name], int(node.value))

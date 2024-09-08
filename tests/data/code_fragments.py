@@ -373,3 +373,24 @@ class NumberLiteralCodeFragment:
         """
 
         return textwrap.dedent(hlir).strip() + "\n"
+
+    @staticmethod
+    def llvm_ir(number_type: str) -> str:
+        _CONV_TABLE = {"F16": "half", "F32": "float", "F64": "double"}
+
+        if number_type in _CONV_TABLE:
+            ntype = _CONV_TABLE[number_type]
+        else:
+            ntype = number_type.lower()
+            if ntype[0] == "u":
+                ntype = "i" + ntype[1:]
+
+        llvm_ir = f"""
+            define {ntype} @"foo"()
+            {{
+            entry:
+              ret {ntype} 10
+            }}
+        """
+
+        return textwrap.dedent(llvm_ir).strip()
