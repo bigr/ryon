@@ -1,6 +1,6 @@
 from lark import Transformer
 
-from ryon.hlir.nodes import Fn, SimpleType, Arg, Suite, Return, DecimalNumber, Summation, Module, Var
+from ryon.hlir.nodes import Fn, SimpleType, Arg, Suite, Return, Summation, Module, Var, UntypedIntegerLiteral
 
 
 class HLIRTransformer(Transformer):
@@ -24,8 +24,11 @@ class HLIRTransformer(Transformer):
     def summation(self, node):
         return Summation(addends=tuple(node))
 
+    def untyped_integer_literal(self, node):
+        return UntypedIntegerLiteral(node[0])
+
     def DECIMAL_NUMBER(self, node):
-        return DecimalNumber(value=int(node.value))
+        return int(node.value)
 
     def function_argument(self, node):
         return Arg(name=node[0], type=node[1])

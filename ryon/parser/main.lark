@@ -43,7 +43,22 @@ _PASS: "pass"
 _RETURN: "return"
 
 // literals
-?number_literal: DECIMAL_NUMBER
+?number_literal: typed_integer_literal
+               | typed_float_literal
+               | untyped_integer_literal
+               | untyped_float_literal
+
+// Typed integer literals with type suffix
+typed_integer_literal: DECIMAL_NUMBER ":" simple_type
+
+// Typed float literals with type suffix
+typed_float_literal: DECIMAL_FLOAT ":" simple_type
+
+// Untyped integer literal
+untyped_integer_literal: DECIMAL_NUMBER
+
+// Untyped float literal
+untyped_float_literal: DECIMAL_FLOAT
 
 // terminals
 
@@ -57,7 +72,10 @@ _LINE_CONTINUATION:  /\\[\t \f]*\r?\n/
 SNAKE_CASE_NAME: /[a-z][a-z_]*\d*/
 UPPER_CAMEL_CASE_NAME: /([A-Z][a-z]*)+\d*/
 
+// Decimal integer (basic form)
 DECIMAL_NUMBER: /\d+/
+// Decimal float with optional exponent part
+DECIMAL_FLOAT: /\d+\.\d+([eE][+-]?\d+)?/
 
 
 %ignore _WHITESPACE

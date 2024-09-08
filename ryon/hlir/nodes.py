@@ -43,6 +43,11 @@ class LiteralNode(HLIRNode):
 
 
 @dataclass(frozen=True)
+class UntypedIntegerLiteral(LiteralNode):
+    value: int
+
+
+@dataclass(frozen=True)
 class DecimalNumber(LiteralNode):
     value: int
 

@@ -1,5 +1,5 @@
 import pytest
-from ryon.hlir.nodes import SimpleType, Suite, Return, DecimalNumber, Fn, Arg, Summation, Var
+from ryon.hlir.nodes import SimpleType, Suite, Return, Fn, Arg, Summation, Var, UntypedIntegerLiteral
 
 from ryon.hlir.yaml_loader import yaml_to_hlir
 
@@ -58,7 +58,7 @@ def test_visit_simple_node(fragment, call_count, calls):
                         name="hello_world",
                         type=SimpleType(name="I32"),
                         args=(),
-                        body=Suite(statements=(Return(expression=DecimalNumber(value=10)),)),
+                        body=Suite(statements=(Return(expression=UntypedIntegerLiteral(value=10)),)),
                     ),
                     "This is module",
                     ("Module",),
@@ -80,7 +80,7 @@ def test_visit_simple_node(fragment, call_count, calls):
                                         addends=(
                                             Var(name="a", type=None),
                                             Var(name="b", type=None),
-                                            DecimalNumber(value=5),
+                                            UntypedIntegerLiteral(value=5),
                                         )
                                     )
                                 ),

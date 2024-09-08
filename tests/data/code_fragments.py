@@ -51,7 +51,10 @@ fragments = [
                     - !Tree
                         node: !Token 'RULE return_statement'
                         subtree:
-                        - !Token 'DECIMAL_NUMBER 10'
+                        - !Tree
+                            node: !Token 'RULE untyped_integer_literal'
+                            subtree:
+                            - !Token 'DECIMAL_NUMBER 10'
         """,
         hlir="""
             !node.Module
@@ -64,7 +67,7 @@ fragments = [
                 body: !node.Suite
                     statements:
                     - !node.Return
-                        expression: !node.DecimalNumber
+                        expression: !node.UntypedIntegerLiteral
                             value: 10
         """,
         llvm_ir="""
@@ -131,7 +134,10 @@ fragments = [
                                 node: !Token 'RULE variable_identifier'
                                 subtree:
                                 - !Token 'SNAKE_CASE_NAME b'
-                            - !Token 'DECIMAL_NUMBER 5'
+                            - !Tree
+                                node: !Token 'RULE untyped_integer_literal'
+                                subtree:
+                                - !Token 'DECIMAL_NUMBER 5'
         """,
         hlir="""
             !node.Module
@@ -160,7 +166,7 @@ fragments = [
                             - !node.Var
                                 name: b
                                 type: null
-                            - !node.DecimalNumber
+                            - !node.UntypedIntegerLiteral
                                 value: 5
         """,
         llvm_ir="""
@@ -302,3 +308,47 @@ class NumberCodeFragment:
         """
 
         return textwrap.dedent(llvm_ir).strip()
+
+
+class NumberLiteralCodeFragment:
+    @staticmethod
+    def code(number_type: str) -> str:
+        code = f"""
+            fn foo() -> {number_type}:
+                return 10:{number_type}
+        """
+
+        return textwrap.dedent(code).strip() + "\n"
+
+    @staticmethod
+    def ast(number_type: str) -> str:
+        ast = f"""
+            !Tree
+            node: !Token 'RULE module'
+            subtree:
+            - !Tree
+                node: !Token 'RULE function_definition'
+                subtree:
+                - !Token 'SNAKE_CASE_NAME foo'
+                - null
+                - !Tree
+                    node: !Token 'RULE simple_type'
+                    subtree:
+                    - !Token 'UPPER_CAMEL_CASE_NAME {number_type}'
+                - !Tree
+                    node: !Token 'RULE suite'
+                    subtree:
+                    - !Tree
+                        node: !Token 'RULE return_statement'
+                        subtree:
+                        - !Tree
+                            node: !Token 'RULE typed_integer_literal'
+                            subtree:
+                            - !Token 'DECIMAL_NUMBER 10'
+                            - !Tree
+                                node: !Token 'RULE simple_type'
+                                subtree:
+                                - !Token 'UPPER_CAMEL_CASE_NAME {number_type}'
+        """
+
+        return textwrap.dedent(ast).strip() + "\n"
