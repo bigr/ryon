@@ -352,3 +352,24 @@ class NumberLiteralCodeFragment:
         """
 
         return textwrap.dedent(ast).strip() + "\n"
+
+    @staticmethod
+    def hlir(number_type: str) -> str:
+        hlir = f"""
+            !node.Module
+            module_statements:
+            - !node.Fn
+                name: foo
+                type: !node.SimpleType
+                    name: {number_type}
+                args: []
+                body: !node.Suite
+                    statements:
+                    - !node.Return
+                        expression: !node.TypedIntegerLiteral
+                            value: 10
+                            type: !node.SimpleType
+                                name: {number_type}
+        """
+
+        return textwrap.dedent(hlir).strip() + "\n"

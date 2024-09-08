@@ -48,6 +48,12 @@ class UntypedIntegerLiteral(LiteralNode):
 
 
 @dataclass(frozen=True)
+class TypedIntegerLiteral(LiteralNode):
+    value: int
+    type: TypeNode
+
+
+@dataclass(frozen=True)
 class DecimalNumber(LiteralNode):
     value: int
 
