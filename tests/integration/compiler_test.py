@@ -1,6 +1,5 @@
 import llvmlite.binding as llvm
 import pytest
-from ryon.hlir.yaml_loader import yaml_to_hlir
 
 from tests.data.code_fragments import fragments
 
@@ -13,8 +12,10 @@ def init_llvm():
 
 
 @pytest.mark.parametrize("fragment", fragments)
-def test_compiler(parser, compiler, init_llvm, fragment):
-    module = compiler.visit(yaml_to_hlir(fragment.hlir))
+def test_compiler(parser, hlir_transformer, compiler, init_llvm, fragment):
+    ast = parser.parse(fragment.code)
+    hlir = hlir_transformer.transform(ast)
+    module = compiler.visit(hlir)
 
     compiled_module = llvm.parse_assembly(str(module))
     compiled_module.verify()
