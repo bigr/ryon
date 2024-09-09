@@ -9,7 +9,7 @@ def test_compiler_initialization():
     RyonCompiler()
 
 
-@pytest.mark.parametrize("fragment", fragments)
+@pytest.mark.parametrize("fragment", [f for f in fragments if f.hlir is not None])
 def test_compiler(compiler, fragment):
     hlir = yaml_to_hlir(fragment.hlir)
 

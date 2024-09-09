@@ -1,7 +1,7 @@
 import ctypes
 from dataclasses import dataclass, field
 import textwrap
-from typing import Any, Type
+from typing import Any, Type, Optional
 
 from ryon.hlir.nodes import SimpleType
 from ryon.symbols.symbols import SymbolTable, Symbol
@@ -11,17 +11,26 @@ from ryon.symbols.symbols import SymbolTable, Symbol
 class Fragment:
     name: str
     code: str = field(repr=False)
-    ast: str = field(repr=False)
-    hlir: str = field(repr=False)
     llvm_ir: str = field(repr=False)
     functions: tuple[tuple[str, Type, tuple[Any, ...], Any], ...] = field(repr=False)
     symbol_table: SymbolTable
+    ast: Optional[str] = field(default=None, repr=False)
+    hlir: Optional[str] = field(default=None, repr=False)
 
     def __post_init__(self):
         # Using object.__setattr__ to bypass the immutability for initialization
         object.__setattr__(self, "code", textwrap.dedent(self.code).strip() + "\n")
-        object.__setattr__(self, "ast", textwrap.dedent(self.ast).strip() + "\n")
-        object.__setattr__(self, "hlir", textwrap.dedent(self.hlir).strip() + "\n")
+
+        if self.ast is not None:
+            object.__setattr__(self, "ast", textwrap.dedent(self.ast).strip() + "\n")
+        else:
+            object.__setattr__(self, "ast", None)
+
+        if self.hlir is not None:
+            object.__setattr__(self, "hlir", textwrap.dedent(self.hlir).strip() + "\n")
+        else:
+            object.__setattr__(self, "hlir", None)
+
         object.__setattr__(self, "llvm_ir", textwrap.dedent(self.llvm_ir).strip())
 
 

@@ -9,7 +9,7 @@ def test_parser_initialization():
     RyonParser()
 
 
-@pytest.mark.parametrize("fragment", fragments)
+@pytest.mark.parametrize("fragment", [f for f in fragments if f.ast is not None])
 def test_parser(parser, fragment):
     ast = parser.parse(fragment.code)
     actual = ast_to_yaml(ast)

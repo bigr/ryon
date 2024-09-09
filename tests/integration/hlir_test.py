@@ -7,7 +7,7 @@ from ryon.hlir.yaml_dumper import hlir_to_yaml
 from tests.data.code_fragments import fragments
 
 
-@pytest.mark.parametrize("fragment", fragments)
+@pytest.mark.parametrize("fragment", [f for f in fragments if f.hlir is not None])
 def test_yaml(hlir_transformer, fragment):
     ast = yaml_to_ast(fragment.ast)
     expected_hlir = hlir_transformer.transform(ast)

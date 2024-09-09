@@ -6,7 +6,7 @@ from ryon.parser.yaml_loader import yaml_to_ast
 from tests.data.code_fragments import fragments, NumberCodeFragment, NumberLiteralCodeFragment
 
 
-@pytest.mark.parametrize("fragment", fragments)
+@pytest.mark.parametrize("fragment", [f for f in fragments if f.ast is not None and f.hlir is not None])
 def test_hlir(hlir_transformer, fragment):
     ast = yaml_to_ast(fragment.ast)
     actual_hlir = hlir_transformer.transform(ast)
