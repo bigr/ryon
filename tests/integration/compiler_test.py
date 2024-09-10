@@ -20,6 +20,10 @@ def test_compiler(parser, hlir_transformer, compiler, init_llvm, fragment):
     compiled_module = llvm.parse_assembly(str(module))
     compiled_module.verify()
 
+    llvm_ir = compiler.visit(hlir)
+    actual = llvm_ir[llvm_ir.find('target datalayout = ""') + 22 :].strip()
+    assert actual == fragment.llvm_ir
+
     target_machine = llvm.Target.from_default_triple().create_target_machine()
     engine = llvm.create_mcjit_compiler(compiled_module, target_machine)
     engine.finalize_object()
