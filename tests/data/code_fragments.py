@@ -195,6 +195,118 @@ fragments = [
             }
         ),
     ),
+    Fragment(
+        name="Simple return",
+        code="""
+            fn test(a: I8, b: I8) -> I8:
+                return a + b + 2:I8
+        """,
+        ast="""
+            !Tree
+            node: !Token 'RULE module'
+            subtree:
+            - !Tree
+                node: !Token 'RULE function_definition'
+                subtree:
+                - !Token 'SNAKE_CASE_NAME test'
+                - !Tree
+                    node: !Token 'RULE function_arguments'
+                    subtree:
+                    - !Tree
+                        node: !Token 'RULE function_argument'
+                        subtree:
+                        - !Token 'SNAKE_CASE_NAME a'
+                        - !Tree
+                            node: !Token 'RULE simple_type'
+                            subtree:
+                            - !Token 'UPPER_CAMEL_CASE_NAME I8'
+                    - !Tree
+                        node: !Token 'RULE function_argument'
+                        subtree:
+                        - !Token 'SNAKE_CASE_NAME b'
+                        - !Tree
+                            node: !Token 'RULE simple_type'
+                            subtree:
+                            - !Token 'UPPER_CAMEL_CASE_NAME I8'
+                - !Tree
+                    node: !Token 'RULE simple_type'
+                    subtree:
+                    - !Token 'UPPER_CAMEL_CASE_NAME I8'
+                - !Tree
+                    node: !Token 'RULE suite'
+                    subtree:
+                    - !Tree
+                        node: !Token 'RULE return_statement'
+                        subtree:
+                        - !Tree
+                            node: !Token 'RULE summation'
+                            subtree:
+                            - !Tree
+                                node: !Token 'RULE variable_identifier'
+                                subtree:
+                                - !Token 'SNAKE_CASE_NAME a'
+                            - !Tree
+                                node: !Token 'RULE variable_identifier'
+                                subtree:
+                                - !Token 'SNAKE_CASE_NAME b'
+                            - !Tree
+                                node: !Token 'RULE typed_integer_literal'
+                                subtree:
+                                - !Token 'DECIMAL_NUMBER 2'
+                                - !Tree
+                                    node: !Token 'RULE simple_type'
+                                    subtree:
+                                    - !Token 'UPPER_CAMEL_CASE_NAME I8'
+        """,
+        hlir="""
+            !node.Module
+            module_statements:
+            - !node.Fn
+                name: test
+                type: !node.SimpleType
+                    name: I8
+                args:
+                - !node.Arg
+                    name: a
+                    type: !node.SimpleType
+                        name: I8
+                - !node.Arg
+                    name: b
+                    type: !node.SimpleType
+                        name: I8
+                body: !node.Suite
+                    statements:
+                    - !node.Return
+                        expression: !node.Summation
+                            addends:
+                            - !node.Var
+                                name: a
+                                type: null
+                            - !node.Var
+                                name: b
+                                type: null
+                            - !node.TypedIntegerLiteral
+                                value: 2
+                                type: !node.SimpleType
+                                    name: I8
+        """,
+        llvm_ir="""
+            define i8 @"test"(i8 %"a", i8 %"b")
+            {
+            entry:
+              %"result" = add i8 %"a", %"b"
+              %"result.1" = add i8 %"result", 2
+              ret i8 %"result.1"
+            }
+        """,
+        functions=(("test", ctypes.CFUNCTYPE(ctypes.c_int8, ctypes.c_int8, ctypes.c_int8), (3, 4), 9),),
+        symbol_table=SymbolTable(
+            {
+                ("test", "a"): Symbol(type=SimpleType(name="I8")),
+                ("test", "b"): Symbol(type=SimpleType(name="I8")),
+            }
+        ),
+    ),
 ]
 
 
